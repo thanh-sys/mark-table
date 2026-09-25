@@ -1,6 +1,6 @@
 import { saveMarkTable } from "../../application/saveMarkTable.js";
-import { calcSumTotal } from "../../application/calcSumTotal.js";
-import { clearErrors, addRow, getMarkCoeSums, getSelectedRows, showErrors, showOutput, updateSumTotal } from "./markTableView.js";
+import { clearErrors, addRow, getMarkCoe, getSelectedRows, showErrors, showOutput, updateSumTotal, getSums, updateTotal } from "./markTableView.js";
+import { calcSum, calcTotal } from "../../domain/markTable.js";
 
 const saveButton = document.getElementById('saveButton');
 saveButton.addEventListener('click', () => {
@@ -20,7 +20,11 @@ addRowButton.addEventListener('click', () => {
 });
 
 export function onMarkCoeChange(row) {
-    const { mark, coe, sums } = getMarkCoeSums(row);
-    const { sum, total } = calcSumTotal(mark, coe, sums);
-    updateSumTotal(row, sum, total);
+    const { mark, coe } = getMarkCoe(row);
+    const sum = calcSum(mark, coe);
+    updateSumTotal(row, sum);
+
+    const sums = getSums();
+    const total = calcTotal(sums);
+    updateTotal(total);
 }

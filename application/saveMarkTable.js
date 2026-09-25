@@ -21,5 +21,5 @@ export function saveMarkTable(rows) {
             + `- Sum: ${row.sum}`);
     }
     
-    return { lines: lines, errorRows : errorRows};
+    return { lines, errorRows };
 } 

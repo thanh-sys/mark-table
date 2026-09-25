@@ -61,14 +61,18 @@ export function showErrors(errorRows) {
 
 export function showOutput(lines) {
     const output = document.getElementById("output");
-    output.textContent = lines.join("\n");
-    output.style.display = "block";
+    output.textContent = lines.concat(`Total: ${document.getElementById('total').textContent}`).join("\n");
 }
 
 export function addRow(onMarkCoeChange) {
     const totalRow = document.getElementById('totalRow');
     const newRow = table.insertRow(totalRow.rowIndex);
-    newRow.insertCell(0).innerHTML = "<input type='checkbox'>";
+    
+    const checkboxInput = document.createElement('input');
+    checkboxInput.type = 'checkbox';
+    checkboxInput.addEventListener("click", () => onMarkCoeChange(newRow));
+    newRow.insertCell(0).appendChild(checkboxInput)
+
     newRow.insertCell(1).innerHTML = "<input type='text'> <p class='first-name-error error'></p> ";
     newRow.insertCell(2).innerHTML = "<input type='text'> <p class='last-name-error error'></p>";
     newRow.insertCell(3).innerHTML = "<input type='date' required> <p class='date-of-birth-error error'></p>";
@@ -92,26 +96,37 @@ export function addRow(onMarkCoeChange) {
         option.textContent = i;
         coeSelect.appendChild(option);
     }
-
     coeSelect.addEventListener("change", () => onMarkCoeChange(newRow));
     newRow.insertCell(5).appendChild(coeSelect);
+
     newRow.insertCell(6).textContent = 0;
     newRow.insertCell(7);
 }
 
-export function getMarkCoeSums(row) {
+export function getMarkCoe(row) {
     const mark = row.cells[4].querySelector('input').value;
     const coe =  row.cells[5].querySelector('select').value;
-    const sums = [];
-    for (const tableRow of table.rows) {
-        if (tableRow === row || tableRow.id === "headerRow" || tableRow.id === "totalRow") continue;
-        sums.push(tableRow.cells[6].textContent);
-    }
-    return { mark: mark, coe: coe, sums: sums };
+
+    return { mark, coe };
 }
 
-export function updateSumTotal(row, sum, total) {
+export function getSums(){
+    const sums = [];
+     for (const tableRow of table.rows) {
+        if ( tableRow.id === "headerRow" || tableRow.id === "totalRow") continue;
+        if(tableRow.cells[0].querySelector('input').checked){
+            sums.push(tableRow.cells[6].textContent);
+        }
+    }
+    return sums;
+}
+
+export function updateSumTotal(row, sum) {
     row.cells[6].textContent = sum;
+}
+
+export function updateTotal(total) {
     document.getElementById('total').textContent = total ;
 }
+
 

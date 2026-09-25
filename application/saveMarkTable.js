@@ -1,50 +1,25 @@
 import { validateRow } from "../domain/markTable.js";
-import { clearError, showError } from "../shared/errorView.js";
-import { MESSAGES } from "../shared/messages.js";
 
-const saveButton = document.getElementById('saveButton');
-saveButton.addEventListener('click', saveMarkTable);
+function formatDate(dateOfBirth) {
+    const [year, month, day] = dateOfBirth.split("-");
+    return `${day}/${month}/${year}`;
+}
 
-function saveMarkTable() {
-    const table = document.getElementById('markTable');
+export function saveMarkTable(rows) {
     const lines = [];
-    let isValid = true;
-    let isChecked = false;
-    for (const row of table.rows){
-        if (row.id === "headerRow" || row.id === "totalRow") continue;
+    const errorRows = [];
+    for (const row of rows){
+        const inputErrors = validateRow(row.firstName, row.lastName, row.dateOfBirth, row.mark);
 
-        const checkbox = row.cells[0].querySelector("input");
-        if (checkbox.checked) {
-            isChecked = true;
-            const firstName = row.cells[1].querySelector("input").value;
-            const lastName = row.cells[2].querySelector("input").value;
-            const dateOfBirth = row.cells[3].querySelector("input").value;
-            const mark = row.cells[4].querySelector("input").value;
-            const coefficient = row.cells[5].querySelector("select").value;
-            const sum = row.cells[6].textContent;  
-            
-            const markTableRules = validateRow(firstName, lastName, dateOfBirth)  
-            for (const rule of markTableRules) {
-                if (!rule.isValid) {
-                    isValid = false;
-                    showError(row.querySelector(`.${rule.elementName}`), rule.message);
-                }else{
-                    clearError(row.querySelector(`.${rule.elementName}`));
-                }
-            }
-
-            if (isValid ===true){
-                lines.push(`First Name: ${firstName} - Last Name: ${lastName} - Birth: ${dateOfBirth} - Mark: ${mark} - Coefficient: ${coefficient} - Sum: ${sum}`);
-            }
+        if (Object.keys(inputErrors).length > 0) {
+            errorRows.push({ rowIndex: row.rowIndex, inputErrors: inputErrors });
+            continue;
         }
-    }    
-    const output = document.getElementById("output");
-    if(!isChecked) {
-        output.textContent = MESSAGES.CHECKED_REQUIRED;
-    } else if (isChecked && isValid) {
-        output.textContent = lines.join("\n");
-        output.style.display = "block";
-    } else {
-        output.textContent = "";
+            
+        lines.push(`First Name: ${row.firstName} - Last Name: ${row.lastName} ` 
+            + `- Birth: ${formatDate(row.dateOfBirth)} - Mark: ${row.mark} - Coefficient: ${row.coe} `
+            + `- Sum: ${row.sum}`);
     }
+    
+    return { lines: lines, errorRows : errorRows};
 } 

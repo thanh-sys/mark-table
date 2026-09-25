@@ -4,9 +4,12 @@ export function isInputNotEmpty(input) {
   return input.trim().length > 0;
 }
 
-/* hàm tạo các rule xác thực cho personal info form
-      nhận input là object chứa dữ liệu từ form
-      mỗi rule là một object chứa fieldName, isValid và message */
-export function makeRule(elementName, condition, message) {
-  return {elementName, isValid: condition, message };
+export function isInputNotBetween1to10(markNumber) {
+  return markNumber < 0 || markNumber > 10;
+}
+
+export function isDateNotInFuture(dateString) {
+  const inputDate = new Date(dateString);
+  const today = new Date(); 
+  return inputDate <= today;
 }

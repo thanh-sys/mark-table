@@ -10,6 +10,11 @@ padding: 6px 8px;
 text-align: center;
 }
 
+th .required{
+  color: red;
+  font-weight: bold;
+}
+
 #totalRow td {
 font-weight: bold;
 background: #f5f1f1;
@@ -26,20 +31,12 @@ white-space: pre-wrap;
 border: 1px solid #ccc;
 padding: 10px;
 background: #fafafa;
+min-height: 150px;
 }
 
 .save-container {
   text-align: right;
   padding-right: 15px;
   size: 40px;
-}
-
-#output {
-  min-height: 150px;
-}
-
-#output h3 {
-  margin-top: -30px;
-  text-align: center;
 }
 

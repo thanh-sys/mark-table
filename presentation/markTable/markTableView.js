@@ -121,7 +121,7 @@ export function getSums(){
     return sums;
 }
 
-export function updateSumTotal(row, sum) {
+export function updateSum(row, sum) {
     row.cells[6].textContent = sum;
 }
 

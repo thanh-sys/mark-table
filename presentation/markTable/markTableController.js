@@ -1,16 +1,19 @@
 import { saveMarkTable } from "../../application/saveMarkTable.js";
-import { clearErrors, addRow, getMarkCoe, getSelectedRows, showErrors, showOutput, updateSum, getSums, updateTotal } from "./markTableView.js";
-import { calcSum, calcTotal } from "../../domain/markTable.js";
+import { clearErrors, addRow, getRowValue, getSelectedRows, showErrors, showOutput, updateSum, getSums, updateTotal } from "./markTableView.js";
+import { MarkTableRow, calcTotal } from "../../domain/markTable.js";
+import { MESSAGES } from "../../shared/messages.js";
 
 const saveButton = document.getElementById('saveButton');
 saveButton.addEventListener('click', () => {
     const rows = getSelectedRows();
-    const result = saveMarkTable(rows);
-    if(result.errorRows.length > 0){
-        showErrors(result.errorRows);
+    if (rows.length === 0) return;
+
+    const errorRows = saveMarkTable(rows);
+    if(errorRows.length > 0){
+        showErrors(errorRows);
     }else{
         clearErrors();
-        showOutput(result.lines);
+        showOutput(rows);
     }
 });
 
@@ -20,8 +23,9 @@ addRowButton.addEventListener('click', () => {
 });
 
 export function onMarkCoeChange(row) {
-    const { mark, coe } = getMarkCoe(row);
-    const sum = calcSum(mark, coe);
+    const rowValue = getRowValue(row);
+    const markRow = new MarkTableRow(rowValue);
+    const sum = markRow.calculateSum();
     updateSum(row, sum);
 
     const sums = getSums();

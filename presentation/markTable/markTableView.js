@@ -1,4 +1,5 @@
 import { showError, clearError } from "../../shared/errorView.js";
+import { MESSAGES } from "../../shared/messages.js";
 
 const table = document.getElementById('markTable');
 const errorElements = {
@@ -8,10 +9,16 @@ const errorElements = {
     mark : 'mark-error'
 }
 
-function getCellValue(row, columnIndex, type) {
-  const cell = row.cells[columnIndex];
-  const element = cell.querySelector(type);
-  return element.value ;
+export function getRowValue(row) {
+  return  {
+    rowIndex: row.rowIndex,
+    firstName : row.cells[1].querySelector("input").value,
+    lastName : row.cells[2].querySelector("input").value,
+    dateOfBirth : row.cells[3].querySelector("input").value,
+    mark : row.cells[4].querySelector("input").value,
+    coe : row.cells[5].querySelector("select").value,
+    sum : row.cells[6].textContent
+    };
 }
 
 export function getSelectedRows() {
@@ -20,18 +27,14 @@ export function getSelectedRows() {
         if(row.id === "headerRow" || row.id === "totalRow") continue;
         const checkbox = row.cells[0].querySelector("input");
         if(checkbox.checked){
-            const rowData = {
-            rowIndex: row.rowIndex,
-            firstName: getCellValue(row, 1, "input"),
-            lastName: getCellValue(row, 2, "input"),
-            dateOfBirth: getCellValue(row, 3, "input"),
-            mark: getCellValue(row, 4, "input"),
-            coe: getCellValue(row, 5, "select"),
-            sum: row.cells[6].textContent
-            };
-            rows.push(rowData);
+            rows.push(getRowValue(row));
         }
-    }            
+    }         
+    if (rows.length === 0) {
+        showError(document.getElementById("output"), MESSAGES.ROW_REQUIRED);
+    }else{
+        clearError(document.getElementById("output"));
+    }
     return rows;
 }
 
@@ -59,7 +62,15 @@ export function showErrors(errorRows) {
     }
 }
 
-export function showOutput(lines) {
+export function showOutput(rows) {
+    const lines = [];
+    for(const row of rows){
+        const [year, month, day] = row.dateOfBirth.split("-");
+          lines.push(`First Name: ${row.firstName} - Last Name: ${row.lastName} ` 
+            + `- Birth: ${`${day}/${month}/${year}`} - Mark: ${row.mark}`
+            + `- Coefficient: ${row.coe} `
+            + `- Sum: ${row.sum}`);
+    }
     const output = document.getElementById("output");
     output.textContent = lines.concat(`Total: ${document.getElementById('total').textContent}`).join("\n");
 }
@@ -101,13 +112,6 @@ export function addRow(onMarkCoeChange) {
 
     newRow.insertCell(6).textContent = 0;
     newRow.insertCell(7);
-}
-
-export function getMarkCoe(row) {
-    const mark = row.cells[4].querySelector('input').value;
-    const coe =  row.cells[5].querySelector('select').value;
-
-    return { mark, coe };
 }
 
 export function getSums(){

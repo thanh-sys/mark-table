@@ -9,6 +9,9 @@ const errorElements = {
     mark : 'mark-error'
 }
 
+/* hàm nhận một hàng trong bảng
+    đọc giá trị checkbox, họ tên, ngày sinh, điểm, hệ số và tổng điểm
+    trả về các giá trị đó dưới dạng object */
 export function getRowValue(row) {
   return  {
     rowIndex: row.rowIndex,
@@ -21,6 +24,10 @@ export function getRowValue(row) {
     };
 }
 
+/* hàm duyệt các hàng trong bảng, bỏ qua hàng tiêu đề và hàng tổng
+    lấy dữ liệu những hàng có checkbox được chọn
+    nếu không có hàng nào được chọn thì hiển thị thông báo, nếu có thì xóa thông báo cũ
+    trả về danh sách dữ liệu các hàng được chọn */
 export function getSelectedRows() {
     const rows = [];
     for (const row of table.rows){
@@ -38,6 +45,8 @@ export function getSelectedRows() {
     return rows;
 }
 
+/* hàm duyệt các hàng dữ liệu, bỏ qua hàng tiêu đề và hàng tổng
+    tìm các phần tử hiển thị lỗi trong mỗi hàng và xóa nội dung lỗi */
 export function clearErrors() {
     for(const row of table.rows) {
         if(row.id === "headerRow" || row.id === "totalRow") continue;
@@ -50,6 +59,10 @@ export function clearErrors() {
     } 
 }
 
+/* hàm nhận danh sách hàng có lỗi
+    xóa các lỗi đang hiển thị
+    duyệt từng hàng lỗi và từng trường bị lỗi
+    tìm phần tử lỗi tương ứng rồi hiển thị thông báo */
 export function showErrors(errorRows) {
     clearErrors();
     for(const errorRow of errorRows) {
@@ -62,6 +75,10 @@ export function showErrors(errorRows) {
     }
 }
 
+/* hàm nhận danh sách hàng hợp lệ
+    chuyển ngày sinh của từng hàng sang định dạng ngày/tháng/năm
+    tạo dòng kết quả gồm thông tin hàng và tổng điểm
+    thêm tổng chung, ghép các dòng thành văn bản và hiển thị lên giao diện */
 export function showOutput(rows) {
     const lines = [];
     for(const row of rows){
@@ -75,12 +92,18 @@ export function showOutput(rows) {
     output.textContent = lines.concat(`Total: ${document.getElementById('total').textContent}`).join("\n");
 }
 
+/* hàm nhận hàm callback để cập nhật điểm và tổng
+    chèn hàng mới trước hàng tổng
+    tạo checkbox, các ô nhập thông tin, ô điểm, danh sách hệ số và ô tổng điểm
+    gắn callback vào sự kiện thay đổi checkbox, điểm và hệ số */
 export function addRow(onMarkCoeChange) {
     const totalRow = document.getElementById('totalRow');
     const newRow = table.insertRow(totalRow.rowIndex);
     
     const checkboxInput = document.createElement('input');
     checkboxInput.type = 'checkbox';
+    /* callback khi thay đổi trạng thái chọn:
+        gọi hàm được truyền vào với hàng mới để cập nhật điểm và tổng */
     checkboxInput.addEventListener("click", () => onMarkCoeChange(newRow));
     newRow.insertCell(0).appendChild(checkboxInput)
 
@@ -94,6 +117,8 @@ export function addRow(onMarkCoeChange) {
     markInput.value = 0;
     markInput.min = 0;
     markInput.max = 10;
+    /* callback khi thay đổi điểm:
+        gọi hàm được truyền vào với hàng mới để cập nhật điểm và tổng */
     markInput.addEventListener("change", () => onMarkCoeChange(newRow));
     markCell.appendChild(markInput);
     const markError = document.createElement("p");
@@ -107,6 +132,8 @@ export function addRow(onMarkCoeChange) {
         option.textContent = i;
         coeSelect.appendChild(option);
     }
+    /* callback khi thay đổi hệ số:
+        gọi hàm được truyền vào với hàng mới để cập nhật điểm và tổng */
     coeSelect.addEventListener("change", () => onMarkCoeChange(newRow));
     newRow.insertCell(5).appendChild(coeSelect);
 
@@ -114,6 +141,9 @@ export function addRow(onMarkCoeChange) {
     newRow.insertCell(7);
 }
 
+/* hàm duyệt các hàng dữ liệu, bỏ qua hàng tiêu đề và hàng tổng
+    chỉ lấy tổng điểm của hàng đang được chọn
+    trả về danh sách tổng điểm */
 export function getSums(){
     const sums = [];
      for (const tableRow of table.rows) {
@@ -125,10 +155,14 @@ export function getSums(){
     return sums;
 }
 
+/* hàm nhận hàng và tổng điểm mới
+    cập nhật nội dung ô tổng điểm của hàng đó */
 export function updateSum(row, sum) {
     row.cells[6].textContent = sum;
 }
 
+/* hàm nhận tổng điểm chung
+    cập nhật nội dung phần tử hiển thị tổng trên giao diện */
 export function updateTotal(total) {
     document.getElementById('total').textContent = total ;
 }

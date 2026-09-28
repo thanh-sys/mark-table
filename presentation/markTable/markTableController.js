@@ -1,6 +1,6 @@
 import { saveMarkTable } from "../../application/saveMarkTable.js";
 import { clearErrors, addRow, getRowValue, getSelectedRows, showErrors, showOutput, updateSum, getSums, updateTotal } from "./markTableView.js";
-import { MarkTableRow, calcTotal } from "../../domain/markTable.js";
+import { MarkTableRow, calculateTotal } from "../../domain/markTable.js";
 
 const saveButton = document.getElementById('saveButton');
 /* callback khi nhấn nút lưu:
@@ -38,6 +38,6 @@ export function onMarkCoeChange(row) {
     updateSum(row, sum);
 
     const sums = getSums();
-    const total = calcTotal(sums);
+    const total = calculateTotal(sums);
     updateTotal(total);
 }

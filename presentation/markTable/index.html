@@ -9,23 +9,28 @@
 
   <body>
     <table id="markTable">
-      <tr id="headerRow">
-        <th></th>
-        <th>First Name <span class="required">*</span> </th>
-        <th>Last Name <span class="required">*</span> </th>
-        <th>Date of birth <span class="required">*</span> </th>
-        <th>Mark</th>
-        <th>Coe</th>
-        <th>Sum</th>
-        <th>
-          <button type="button" id="addRowButton">Add Row</button>
-        </th>
-      </tr>
-      <tr id="totalRow">
-        <td colspan="6" style="text-align:right">Total</td>
-        <td id="total">0</td>
-        <td></td>
-      </tr>
+      <thead>
+        <tr>
+          <th></th>
+          <th>First Name <span class="required">*</span> </th>
+          <th>Last Name <span class="required">*</span> </th>
+          <th>Date of birth <span class="required">*</span> </th>
+          <th>Mark</th>
+          <th>Coe</th>
+          <th>Sum</th>
+          <th>
+            <button type="button" id="addRowButton">Add Row</button>
+          </th>
+        </tr>
+      </thead>
+      <tbody id="inputRows"></tbody>
+      <tfoot>
+        <tr id="totalRow">
+          <td colspan="6" style="text-align:right">Total</td>
+          <td id="total">0</td>
+          <td></td>
+        </tr>
+      </tfoot>
     </table>
 
     <div class="save-container">
@@ -33,6 +38,28 @@
     </div>
 
     <div id="output"></div>
+    <table id="outputTable">
+      <thead>
+        <tr>
+          <th colspan="6" id="outputHeader">Output</th>
+        </tr>
+        <tr>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Date of birth</th>
+          <th>Mark</th>
+          <th>Coe</th>
+          <th>Sum</th>
+        </tr>
+      </thead>
+      <tbody id="outputRows"></tbody>
+      <tfoot>
+        <tr id="totalRow">
+          <td colspan="5" style="text-align:right">Total</td>
+          <td id="outputTotal">0</td>
+        </tr>
+      </tfoot>
+    </table>
 
     <script type="module" src="./markTableController.js"></script>
 

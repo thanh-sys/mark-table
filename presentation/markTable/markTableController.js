@@ -1,5 +1,5 @@
 import { saveMarkTable } from "../../application/saveMarkTable.js";
-import { clearErrors, addRow, getRowValue, getSelectedRows, showErrors, showOutput, updateSum, getSums, updateTotal } from "./markTableView.js";
+import { clearErrors, addRow, getRowValue, getRows, showErrors, showOutput, updateSum, getSums, updateTotal } from "./markTableView.js";
 import { MarkTableRow, calculateTotal } from "../../domain/markTable.js";
 
 const saveButton = document.getElementById('saveButton');
@@ -8,7 +8,7 @@ const saveButton = document.getElementById('saveButton');
     kiểm tra dữ liệu các hàng đã chọn
     nếu có lỗi thì hiển thị lỗi, nếu không thì xóa lỗi cũ và hiển thị kết quả */
 saveButton.addEventListener('click', () => {
-    const rows = getSelectedRows();
+    const rows = getRows();
     if (rows.length === 0) return;
 
     const errorRows = saveMarkTable(rows);

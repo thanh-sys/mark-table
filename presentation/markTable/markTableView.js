@@ -1,6 +1,6 @@
 import { showError, clearError } from "../../shared/errorView.js";
-import { MESSAGES } from "../../shared/messages.js";
 
+const output = document.getElementById("output");   
 const inputRows = document.getElementById('inputRows');
 const errorElements = {
     firstName : 'first-name-error',
@@ -24,27 +24,15 @@ export function getRowValue(row) {
     };
 }
 
-/* hàm duyệt các hàng trong bảng, bỏ qua hàng tiêu đề và hàng tổng
-    lấy dữ liệu những hàng có checkbox được chọn
+/* hàm duyệt các hàng trong tbody
+    lấy dữ liệu những hàng có 
     nếu không có hàng nào được chọn thì hiển thị thông báo, nếu có thì xóa thông báo cũ
     trả về danh sách dữ liệu các hàng được chọn */
-export function getSelectedRows() {
+export function getRows() {
     const rows = [];
-   for (const row of inputRows.rows){
-        const checkbox = row.cells[0].querySelector("input");
-        if(checkbox.checked){
-            rows.push(getRowValue(row));
-        }
+    for (const row of inputRows.rows){
+        rows.push(getRowValue(row));
     }         
-
-    if (rows.length === 0) {
-        showError(document.getElementById("output"), MESSAGES.ROW_REQUIRED);
-        const outputRows = document.getElementById("outputRows");
-        outputRows.replaceChildren();
-    }else {
-        clearError(document.getElementById("output"));
-    }
-
     return rows;
 }
 
@@ -88,7 +76,7 @@ export function showOutput(rows) {
             + `- Coefficient: ${row.coe} `
             + `- Sum: ${row.sum}`);
     }
-    const output = document.getElementById("output");
+
     output.textContent = lines.concat(`Total: ${document.getElementById('total').textContent}`).join("\n");
 }
 
@@ -98,14 +86,8 @@ export function showOutput(rows) {
     gắn callback vào sự kiện thay đổi checkbox, điểm và hệ số */
 export function addRow(onMarkCoeChange) {
     const newRow = inputRows.insertRow();
-    
-    const checkboxInput = document.createElement('input');
-    checkboxInput.type = 'checkbox';
-    /* callback khi thay đổi trạng thái chọn:
-        gọi hàm được truyền vào với hàng mới để cập nhật điểm và tổng */
-    checkboxInput.addEventListener("click", () => onMarkCoeChange(newRow));
-    newRow.insertCell(0).appendChild(checkboxInput)
 
+    newRow.insertCell(0).innerHTML = "<input type='checkbox'>";
     newRow.insertCell(1).innerHTML = "<input type='text'> <p class='first-name-error error'></p> ";
     newRow.insertCell(2).innerHTML = "<input type='text'> <p class='last-name-error error'></p>";
     newRow.insertCell(3).innerHTML = "<input type='date'> <p class='date-of-birth-error error'></p>";
@@ -146,9 +128,7 @@ export function addRow(onMarkCoeChange) {
 export function getSums(){
     const sums = [];
     for (const tableRow of inputRows.rows) {
-        if(tableRow.cells[0].querySelector('input').checked){
-            sums.push(tableRow.cells[6].textContent);
-        }
+        sums.push(tableRow.cells[6].textContent);
     }
     return sums;
 }

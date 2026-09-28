@@ -1,7 +1,7 @@
 import { showError, clearError } from "../../shared/errorView.js";
 import { MESSAGES } from "../../shared/messages.js";
 
-const table = document.getElementById('markTable');
+const inputRows = document.getElementById('inputRows');
 const errorElements = {
     firstName : 'first-name-error',
     lastName : 'last-name-error',
@@ -14,7 +14,7 @@ const errorElements = {
     trả về các giá trị đó dưới dạng object */
 export function getRowValue(row) {
   return  {
-    rowIndex: row.rowIndex,
+    rowIndex: row.sectionRowIndex,
     firstName : row.cells[1].querySelector("input").value,
     lastName : row.cells[2].querySelector("input").value,
     dateOfBirth : row.cells[3].querySelector("input").value,
@@ -30,26 +30,28 @@ export function getRowValue(row) {
     trả về danh sách dữ liệu các hàng được chọn */
 export function getSelectedRows() {
     const rows = [];
-    for (const row of table.rows){
-        if(row.id === "headerRow" || row.id === "totalRow") continue;
+   for (const row of inputRows.rows){
         const checkbox = row.cells[0].querySelector("input");
         if(checkbox.checked){
             rows.push(getRowValue(row));
         }
     }         
+
     if (rows.length === 0) {
         showError(document.getElementById("output"), MESSAGES.ROW_REQUIRED);
-    }else{
+        const outputRows = document.getElementById("outputRows");
+        outputRows.replaceChildren();
+    }else {
         clearError(document.getElementById("output"));
     }
+
     return rows;
 }
 
-/* hàm duyệt các hàng dữ liệu, bỏ qua hàng tiêu đề và hàng tổng
+/* hàm duyệt các hàng dữ liệu trong tbody
     tìm các phần tử hiển thị lỗi trong mỗi hàng và xóa nội dung lỗi */
 export function clearErrors() {
-    for(const row of table.rows) {
-        if(row.id === "headerRow" || row.id === "totalRow") continue;
+    for(const row of inputRows.rows) {
         for(const errorName of Object.values(errorElements)){
             const errorElement = row.querySelector(`.${errorName}`);
             if (errorElement) {
@@ -67,18 +69,16 @@ export function showErrors(errorRows) {
     clearErrors();
     for(const errorRow of errorRows) {
         for(const [errorName,message] of Object.entries(errorRow.inputErrors)){
-            const errorElement = table.rows[errorRow.rowIndex]?.querySelector(`.${errorElements[errorName]}`);
-            if (errorElement) {
+            const errorElement = inputRows.rows[errorRow.rowIndex].querySelector(`.${errorElements[errorName]}`);
                 showError(errorElement, message);
-            }
         }
     }
 }
 
 /* hàm nhận danh sách hàng hợp lệ
-    chuyển ngày sinh của từng hàng sang định dạng ngày/tháng/năm
-    tạo dòng kết quả gồm thông tin hàng và tổng điểm
-    thêm tổng chung, ghép các dòng thành văn bản và hiển thị lên giao diện */
+      xóa các dòng kết quả đang hiển thị
+    duyệt từng hàng hợp lệ, tạo dòng kết quả và thêm vào bảng output
+    lấy tổng điểm chung từ giao diện và hiển thị vào phần tổng của bảng output */
 export function showOutput(rows) {
     const lines = [];
     for(const row of rows){
@@ -97,8 +97,7 @@ export function showOutput(rows) {
     tạo checkbox, các ô nhập thông tin, ô điểm, danh sách hệ số và ô tổng điểm
     gắn callback vào sự kiện thay đổi checkbox, điểm và hệ số */
 export function addRow(onMarkCoeChange) {
-    const totalRow = document.getElementById('totalRow');
-    const newRow = table.insertRow(totalRow.rowIndex);
+    const newRow = inputRows.insertRow();
     
     const checkboxInput = document.createElement('input');
     checkboxInput.type = 'checkbox';
@@ -109,7 +108,7 @@ export function addRow(onMarkCoeChange) {
 
     newRow.insertCell(1).innerHTML = "<input type='text'> <p class='first-name-error error'></p> ";
     newRow.insertCell(2).innerHTML = "<input type='text'> <p class='last-name-error error'></p>";
-    newRow.insertCell(3).innerHTML = "<input type='date' required> <p class='date-of-birth-error error'></p>";
+    newRow.insertCell(3).innerHTML = "<input type='date'> <p class='date-of-birth-error error'></p>";
     
     const markCell = newRow.insertCell(4);
     const markInput = document.createElement("input");
@@ -141,13 +140,12 @@ export function addRow(onMarkCoeChange) {
     newRow.insertCell(7);
 }
 
-/* hàm duyệt các hàng dữ liệu, bỏ qua hàng tiêu đề và hàng tổng
+/* hàm duyệt các hàng dữ liệu trong tbody
     chỉ lấy tổng điểm của hàng đang được chọn
     trả về danh sách tổng điểm */
 export function getSums(){
     const sums = [];
-     for (const tableRow of table.rows) {
-        if ( tableRow.id === "headerRow" || tableRow.id === "totalRow") continue;
+    for (const tableRow of inputRows.rows) {
         if(tableRow.cells[0].querySelector('input').checked){
             sums.push(tableRow.cells[6].textContent);
         }

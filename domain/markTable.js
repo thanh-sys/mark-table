@@ -1,5 +1,5 @@
 import { MESSAGES } from "../shared/messages.js";
-import { isDateNotInFuture, isInputNotBetween1to10, isInputNotEmpty } from "../shared/validation.js";
+import { isDateNotInFuture, isInputNotBetween0to10, isInputNotEmpty } from "../shared/validation.js";
 
 export class MarkTableRow {
   /* hàm nhận object chứa dữ liệu một hàng điểm
@@ -41,7 +41,7 @@ export class MarkTableRow {
       errors.dateOfBirth = MESSAGES.DATE_OF_BIRTH_INVALID;
     }
 
-    if (isInputNotBetween1to10(Number(this.mark))) {
+    if (isInputNotBetween0to10(Number(this.mark))) {
       errors.mark = MESSAGES.MARK_OUT_OF_RANGE;
     }
 
@@ -53,7 +53,7 @@ export class MarkTableRow {
   khởi tạo tổng bằng 0
   lần lượt chuyển từng giá trị thành số và cộng vào tổng
   trả về tổng điểm */
-export function calcTotal(sums) {
+export function calculateTotal(sums) {
     let total = 0;
     for (const sum of sums) {
         total += Number(sum);

@@ -7,7 +7,7 @@ export function isInputNotEmpty(input) {
 /* hàm nhận điểm dưới dạng số
     kiểm tra điểm có nhỏ hơn 0 hoặc lớn hơn 10 không
     trả về true nếu điểm nằm ngoài khoảng 0 đến 10, ngược lại trả về false */
-export function isInputNotBetween1to10(markNumber) {
+export function isInputNotBetween0to10(markNumber) {
   return markNumber < 0 || markNumber > 10;
 }
 

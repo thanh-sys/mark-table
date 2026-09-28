@@ -8,24 +8,30 @@
   </head>
 
   <body>
+    
     <table id="markTable">
-      <tr id="headerRow">
-        <th></th>
-        <th>First Name <span class="required">*</span> </th>
-        <th>Last Name <span class="required">*</span> </th>
-        <th>Date of birth <span class="required">*</span> </th>
-        <th>Mark</th>
-        <th>Coe</th>
-        <th>Sum</th>
-        <th>
-          <button type="button" id="addRowButton">Add Row</button>
-        </th>
-      </tr>
-      <tr id="totalRow">
-        <td colspan="6" style="text-align:right">Total</td>
-        <td id="total">0</td>
-        <td></td>
-      </tr>
+      <thead>
+        <tr>
+          <th></th>
+          <th>First Name <span class="required">*</span> </th>
+          <th>Last Name <span class="required">*</span> </th>
+          <th>Date of birth <span class="required">*</span> </th>
+          <th>Mark</th>
+          <th>Coe</th>
+          <th>Sum</th>
+          <th>
+            <button type="button" id="addRowButton">Add Row</button>
+          </th>
+        </tr>
+      </thead>
+      <tbody id="inputRows"></tbody>
+      <tfoot>
+        <tr id="totalRow">
+          <td colspan="6" style="text-align:right">Total</td>
+          <td id="total">0</td>
+          <td></td>
+        </tr>
+      </tfoot>
     </table>
 
     <div class="save-container">

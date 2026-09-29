@@ -41,12 +41,12 @@ export class MarkTableView {
 
     showErrors(errorRows) {
         this.clearErrors();
-        for (const { rowIndex, inputErrors } of errorRows) {
+        errorRows.forEach(({ rowIndex, inputErrors }) => {
             const row = this.inputRows.rows[rowIndex];
-            for (const [name, message] of Object.entries(inputErrors)) {
+            Object.entries(inputErrors).forEach(([name, message]) => {
                 showError(row.fields[`${name}-error`], message);
-            }
-        }
+            });
+        });
     }
 
     showOutput(rows) {

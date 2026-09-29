@@ -11,6 +11,8 @@ export class MarkTableView {
     }
 
     init() {
+        window.onMarkCoeChange = (row) => this.onMarkCoeChange(row);
+        window.clearError = clearError;
         this.optionsHtml = this.coefficients.map(c => `<option>${c}</option>`).join("");
     }
 
@@ -41,12 +43,12 @@ export class MarkTableView {
 
     showErrors(errorRows) {
         this.clearErrors();
-        for (const { rowIndex, inputErrors } of errorRows) {
+        errorRows.forEach(({ rowIndex, inputErrors }) => {
             const row = this.inputRows.rows[rowIndex];
-            for (const [name, message] of Object.entries(inputErrors)) {
+            Object.entries(inputErrors).forEach(([name, message]) => {
                 showError(row.fields[`${name}-error`], message);
-            }
-        }
+            });
+        });
     }
 
     showOutput(rows) {
@@ -63,11 +65,11 @@ export class MarkTableView {
         const row = this.inputRows.insertRow();
         row.innerHTML = `
             <td><input type="checkbox" data-field="checkbox"></td>
-            <td><input type="text" data-field="firstName"><p class="error" data-field="firstName-error"></p></td>
-            <td><input type="text" data-field="lastName"><p class="error" data-field="lastName-error"></p></td>
-            <td><input type="date" data-field="dateOfBirth"><p class="error" data-field="dateOfBirth-error"></p></td>
-            <td><input type="number" value="0" min="0" max="10" data-field="mark"><p class="error" data-field="mark-error"></p></td>
-            <td><select data-field="coe">${this.optionsHtml}</select></td>
+            <td><input type="text" data-field="firstName" oninput="clearError(this.nextElementSibling)"><p class="error" data-field="firstName-error"></p></td>
+            <td><input type="text" data-field="lastName" oninput="clearError(this.nextElementSibling)"><p class="error" data-field="lastName-error"></p></td>
+            <td><input type="date" data-field="dateOfBirth" oninput="clearError(this.nextElementSibling)"><p class="error" data-field="dateOfBirth-error"></p></td>
+            <td><input type="number" value="0" min="0" max="10" data-field="mark" oninput="clearError(this.nextElementSibling)" onchange="onMarkCoeChange(this.closest('tr'))"><p class="error" data-field="mark-error"></p></td>
+            <td><select data-field="coe" onchange="onMarkCoeChange(this.closest('tr'))">${this.optionsHtml}</select></td>
             <td data-field="sum">0</td>
             <td></td>`;
 
@@ -75,24 +77,15 @@ export class MarkTableView {
         row.querySelectorAll("[data-field]").forEach(el => {
             row.fields[el.dataset.field] = el;
         });
-
-        row.fields.firstName.addEventListener("input", () => clearError(row.fields["firstName-error"]));
-        row.fields.lastName.addEventListener("input", () => clearError(row.fields["lastName-error"]));
-        row.fields.dateOfBirth.addEventListener("input", () => clearError(row.fields["dateOfBirth-error"]));
-        row.fields.mark.addEventListener("input", () => clearError(row.fields["mark-error"]));
-        row.fields.coe.addEventListener("input", () => clearError(row.fields["coe-error"]));
-        row.fields.mark.addEventListener("change", () => this.onMarkCoeChange(row));
-        row.fields.coe.addEventListener("change", () => this.onMarkCoeChange(row));
     }
 
     onMarkCoeChange(row) {
-        const rowValue = this.getRowValue(row);
-        const markRow = new MarkTableRow(rowValue);
-        const sum = markRow.calculateSum();
+        const mark = row.fields.mark.value;
+        const coe = row.fields.coe.value;
+        const sum = new MarkTableRow({ mark, coe }).calculateSum();
         row.fields.sum.textContent = sum;
 
-        const sums = this.getSums();
-        const total = calculateTotal(sums);
+        const total = calculateTotal(this.getSums());
         this.total.textContent = total;
     }
 }

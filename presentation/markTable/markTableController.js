@@ -1,43 +1,29 @@
 import { saveMarkTable } from "../../application/saveMarkTable.js";
-import { clearErrors, addRow, getRowValue, getRows, showErrors, showOutput, updateSum, getSums, updateTotal } from "./markTableView.js";
-import { MarkTableRow, calculateTotal } from "../../domain/markTable.js";
-
-const saveButton = document.getElementById('saveButton');
-/* callback khi nhấn nút lưu:
-    lấy các hàng đang được chọn; dừng nếu không có hàng nào
-    kiểm tra dữ liệu các hàng đã chọn
-    nếu có lỗi thì hiển thị lỗi, nếu không thì xóa lỗi cũ và hiển thị kết quả */
-saveButton.addEventListener('click', () => {
-    const rows = getRows();
-    if (rows.length === 0) return;
-
-    const errorRows = saveMarkTable(rows);
-    if(errorRows.length > 0){
-        showErrors(errorRows);
-    }else{
-        clearErrors();
-        showOutput(rows);
+import { MarkTableView } from "./markTableView.js";
+class MarkTableController {
+    constructor(view) {
+        this.view = view;
+        document.getElementById("saveButton").addEventListener("click", () => this.save());
+        document.getElementById("addRowButton").addEventListener("click", () => this.view.addRow());
     }
-});
 
-const addRowButton = document.getElementById('addRowButton');
-/* callback khi nhấn nút thêm hàng:
-    tạo một hàng mới và truyền hàm cập nhật điểm, tổng vào phần hiển thị */
-addRowButton.addEventListener('click', () => {
-    addRow(onMarkCoeChange)
-});
+    init() {
+        this.view.init();
+    }
 
-/* hàm nhận một hàng trong bảng
-    lấy dữ liệu của hàng, tạo đối tượng hàng điểm và tính tổng điểm hàng
-    cập nhật tổng điểm hàng trên giao diện
-    lấy tổng các hàng đang chọn, tính tổng chung và cập nhật giao diện */
-export function onMarkCoeChange(row) {
-    const rowValue = getRowValue(row);
-    const markRow = new MarkTableRow(rowValue);
-    const sum = markRow.calculateSum();
-    updateSum(row, sum);
+    save() {
+        const rows = this.view.getRows();
+        if (rows.length === 0) return;
 
-    const sums = getSums();
-    const total = calculateTotal(sums);
-    updateTotal(total);
+        const errorRows = saveMarkTable(rows);
+        if (errorRows.length > 0) {
+            this.view.showErrors(errorRows);
+        } else {
+            this.view.clearErrors();
+            this.view.showOutput(rows);
+        }
+    }
 }
+
+const controller = new MarkTableController(new MarkTableView());
+controller.init();

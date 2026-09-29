@@ -1,148 +1,98 @@
 import { showError, clearError } from "../../shared/errorView.js";
+import { MarkTableRow, calculateTotal } from "../../domain/markTable.js";
 
-const output = document.getElementById("output");   
-const inputRows = document.getElementById('inputRows');
-const errorElements = {
-    firstName : 'first-name-error',
-    lastName : 'last-name-error',
-    dateOfBirth : 'date-of-birth-error',
-    mark : 'mark-error'
-}
+export class MarkTableView {
+    constructor() {
+        this.output = document.getElementById("output");
+        this.inputRows = document.getElementById("inputRows");
+        this.total = document.getElementById("total");
+        this.coefficients = [1,2,3,4,5,6,7,8,9,10];
+        this.optionsHtml = "";
+    }
 
-/* hàm nhận một hàng trong bảng
-    đọc giá trị checkbox, họ tên, ngày sinh, điểm, hệ số và tổng điểm
-    trả về các giá trị đó dưới dạng object */
-export function getRowValue(row) {
-  return  {
-    rowIndex: row.sectionRowIndex,
-    firstName : row.cells[1].querySelector("input").value,
-    lastName : row.cells[2].querySelector("input").value,
-    dateOfBirth : row.cells[3].querySelector("input").value,
-    mark : row.cells[4].querySelector("input").value,
-    coe : row.cells[5].querySelector("select").value,
-    sum : row.cells[6].textContent
-    };
-}
+    init() {
+        this.optionsHtml = this.coefficients.map(c => `<option>${c}</option>`).join("");
+    }
 
-/* hàm duyệt các hàng trong tbody
-    lấy dữ liệu những hàng có 
-    nếu không có hàng nào được chọn thì hiển thị thông báo, nếu có thì xóa thông báo cũ
-    trả về danh sách dữ liệu các hàng được chọn */
-export function getRows() {
-    const rows = [];
-    for (const row of inputRows.rows){
-        rows.push(getRowValue(row));
-    }         
-    return rows;
-}
+    getRowValue(row) {
+        const f = row.fields;
+        return {
+            rowIndex: row.sectionRowIndex,
+            firstName: f.firstName.value,
+            lastName: f.lastName.value,
+            dateOfBirth: f.dateOfBirth.value,
+            mark: f.mark.value,
+            coe: f.coe.value,
+            sum: f.sum.textContent
+        };
+    }
 
-/* hàm duyệt các hàng dữ liệu trong tbody
-    tìm các phần tử hiển thị lỗi trong mỗi hàng và xóa nội dung lỗi */
-export function clearErrors() {
-    for(const row of inputRows.rows) {
-        for(const errorName of Object.values(errorElements)){
-            const errorElement = row.querySelector(`.${errorName}`);
-            if (errorElement) {
-                clearError(errorElement);
+    getRows() {
+        return Array.from(this.inputRows.rows, row => this.getRowValue(row));
+    }
+
+    getSums() {
+        return Array.from(this.inputRows.rows, row => row.fields.sum.textContent);
+    }
+
+    clearErrors() {
+        this.inputRows.querySelectorAll(".error").forEach(e => clearError(e));
+    }
+
+    showErrors(errorRows) {
+        this.clearErrors();
+        for (const { rowIndex, inputErrors } of errorRows) {
+            const row = this.inputRows.rows[rowIndex];
+            for (const [name, message] of Object.entries(inputErrors)) {
+                showError(row.fields[`${name}-error`], message);
             }
         }
-    } 
-}
-
-/* hàm nhận danh sách hàng có lỗi
-    xóa các lỗi đang hiển thị
-    duyệt từng hàng lỗi và từng trường bị lỗi
-    tìm phần tử lỗi tương ứng rồi hiển thị thông báo */
-export function showErrors(errorRows) {
-    clearErrors();
-    for(const errorRow of errorRows) {
-        for(const [errorName,message] of Object.entries(errorRow.inputErrors)){
-            const errorElement = inputRows.rows[errorRow.rowIndex].querySelector(`.${errorElements[errorName]}`);
-                showError(errorElement, message);
-        }
-    }
-}
-
-/* hàm nhận danh sách hàng hợp lệ
-      xóa các dòng kết quả đang hiển thị
-    duyệt từng hàng hợp lệ, tạo dòng kết quả và thêm vào bảng output
-    lấy tổng điểm chung từ giao diện và hiển thị vào phần tổng của bảng output */
-export function showOutput(rows) {
-    const lines = [];
-    for(const row of rows){
-        const [year, month, day] = row.dateOfBirth.split("-");
-          lines.push(`First Name: ${row.firstName} - Last Name: ${row.lastName} ` 
-            + `- Birth: ${`${day}/${month}/${year}`} - Mark: ${row.mark}`
-            + `- Coefficient: ${row.coe} `
-            + `- Sum: ${row.sum}`);
     }
 
-    output.textContent = lines.concat(`Total: ${document.getElementById('total').textContent}`).join("\n");
-}
-
-/* hàm nhận hàm callback để cập nhật điểm và tổng
-    chèn hàng mới trước hàng tổng
-    tạo checkbox, các ô nhập thông tin, ô điểm, danh sách hệ số và ô tổng điểm
-    gắn callback vào sự kiện thay đổi checkbox, điểm và hệ số */
-export function addRow(onMarkCoeChange) {
-    const newRow = inputRows.insertRow();
-
-    newRow.insertCell(0).innerHTML = "<input type='checkbox'>";
-    newRow.insertCell(1).innerHTML = "<input type='text'> <p class='first-name-error error'></p> ";
-    newRow.insertCell(2).innerHTML = "<input type='text'> <p class='last-name-error error'></p>";
-    newRow.insertCell(3).innerHTML = "<input type='date'> <p class='date-of-birth-error error'></p>";
-    
-    const markCell = newRow.insertCell(4);
-    const markInput = document.createElement("input");
-    markInput.type = "number";
-    markInput.value = 0;
-    markInput.min = 0;
-    markInput.max = 10;
-    /* callback khi thay đổi điểm:
-        gọi hàm được truyền vào với hàng mới để cập nhật điểm và tổng */
-    markInput.addEventListener("change", () => onMarkCoeChange(newRow));
-    markCell.appendChild(markInput);
-    const markError = document.createElement("p");
-    markError.className = "mark-error error";
-    markCell.appendChild(markError);
-
-    const coeSelect = document.createElement("select");
-    for (let i = 1; i <=10 ; i++){
-        const option = document.createElement("option");
-        option.value = i;
-        option.textContent = i;
-        coeSelect.appendChild(option);
+    showOutput(rows) {
+        const lines = rows.map(row => {
+            const [year, month, day] = row.dateOfBirth.split("-");
+            return `First Name: ${row.firstName} - Last Name: ${row.lastName} `
+                + `- Birth: ${day}/${month}/${year} - Mark: ${row.mark} `
+                + `- Coefficient: ${row.coe} - Sum: ${row.sum}`;
+        });
+        this.output.textContent = lines.concat(`Total: ${this.total.textContent}`).join("\n");
     }
-    /* callback khi thay đổi hệ số:
-        gọi hàm được truyền vào với hàng mới để cập nhật điểm và tổng */
-    coeSelect.addEventListener("change", () => onMarkCoeChange(newRow));
-    newRow.insertCell(5).appendChild(coeSelect);
 
-    newRow.insertCell(6).textContent = 0;
-    newRow.insertCell(7);
-}
+    addRow() {
+        const row = this.inputRows.insertRow();
+        row.innerHTML = `
+            <td><input type="checkbox" data-field="checkbox"></td>
+            <td><input type="text" data-field="firstName"><p class="error" data-field="firstName-error"></p></td>
+            <td><input type="text" data-field="lastName"><p class="error" data-field="lastName-error"></p></td>
+            <td><input type="date" data-field="dateOfBirth"><p class="error" data-field="dateOfBirth-error"></p></td>
+            <td><input type="number" value="0" min="0" max="10" data-field="mark"><p class="error" data-field="mark-error"></p></td>
+            <td><select data-field="coe">${this.optionsHtml}</select></td>
+            <td data-field="sum">0</td>
+            <td></td>`;
 
-/* hàm duyệt các hàng dữ liệu trong tbody
-    chỉ lấy tổng điểm của hàng đang được chọn
-    trả về danh sách tổng điểm */
-export function getSums(){
-    const sums = [];
-    for (const tableRow of inputRows.rows) {
-        sums.push(tableRow.cells[6].textContent);
+        row.fields = {};
+        row.querySelectorAll("[data-field]").forEach(el => {
+            row.fields[el.dataset.field] = el;
+        });
+
+        row.fields.firstName.addEventListener("input", () => clearError(row.fields["firstName-error"]));
+        row.fields.lastName.addEventListener("input", () => clearError(row.fields["lastName-error"]));
+        row.fields.dateOfBirth.addEventListener("input", () => clearError(row.fields["dateOfBirth-error"]));
+        row.fields.mark.addEventListener("input", () => clearError(row.fields["mark-error"]));
+        row.fields.coe.addEventListener("input", () => clearError(row.fields["coe-error"]));
+        row.fields.mark.addEventListener("change", () => this.onMarkCoeChange(row));
+        row.fields.coe.addEventListener("change", () => this.onMarkCoeChange(row));
     }
-    return sums;
+
+    onMarkCoeChange(row) {
+        const rowValue = this.getRowValue(row);
+        const markRow = new MarkTableRow(rowValue);
+        const sum = markRow.calculateSum();
+        row.fields.sum.textContent = sum;
+
+        const sums = this.getSums();
+        const total = calculateTotal(sums);
+        this.total.textContent = total;
+    }
 }
-
-/* hàm nhận hàng và tổng điểm mới
-    cập nhật nội dung ô tổng điểm của hàng đó */
-export function updateSum(row, sum) {
-    row.cells[6].textContent = sum;
-}
-
-/* hàm nhận tổng điểm chung
-    cập nhật nội dung phần tử hiển thị tổng trên giao diện */
-export function updateTotal(total) {
-    document.getElementById('total').textContent = total ;
-}
-
-

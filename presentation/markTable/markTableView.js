@@ -15,7 +15,9 @@ export class MarkTableView {
         window.clearError = clearError;
         this.optionsHtml = this.coefficients.map(c => `<option>${c}</option>`).join("");
     }
-
+    /* hàm nhận một hàng trong bảng
+        đọc giá trị checkbox, họ tên, ngày sinh, điểm, hệ số và tổng điểm
+        trả về các giá trị đó dưới dạng object */
     getRowValue(row) {
         const f = row.fields;
         return {
@@ -29,18 +31,26 @@ export class MarkTableView {
         };
     }
 
+    /* hàm duyệt các hàng trong tbody
+    gọi hàm getRowValue cho từng hàng và trả về danh sách các object chứa dữ liệu của các hàng */
     getRows() {
         return Array.from(this.inputRows.rows, row => this.getRowValue(row));
     }
-
+    
     getSums() {
         return Array.from(this.inputRows.rows, row => row.fields.sum.textContent);
     }
 
+    /* hàm duyệt các hàng dữ liệu trong tbody
+    tìm tất cả phần tử hiển thị lỗi trong mỗi hàng và xóa nội dung lỗi */
     clearErrors() {
         this.inputRows.querySelectorAll(".error").forEach(e => clearError(e));
     }
 
+    /* hàm nhận danh sách hàng có lỗi
+    xóa các lỗi đang hiển thị
+    duyệt từng hàng lỗi và từng trường bị lỗi
+    tìm phần tử lỗi tương ứng rồi hiển thị thông báo */
     showErrors(errorRows) {
         this.clearErrors();
         errorRows.forEach(({ rowIndex, inputErrors }) => {
@@ -71,14 +81,18 @@ export class MarkTableView {
             <td><input type="number" value="0" min="0" max="10" data-field="mark" oninput="clearError(this.nextElementSibling)" onchange="onMarkCoeChange(this.closest('tr'))"><p class="error" data-field="mark-error"></p></td>
             <td><select data-field="coe" onchange="onMarkCoeChange(this.closest('tr'))">${this.optionsHtml}</select></td>
             <td data-field="sum">0</td>
-            <td></td>`;
-
+            <td><button type="button" class="delete-row-button" onclick="deleteRow(this)">X</button></td>`;
+ 
         row.fields = {};
         row.querySelectorAll("[data-field]").forEach(el => {
             row.fields[el.dataset.field] = el;
         });
     }
 
+    /* hàm nhận một hàng trong bảng
+    lấy dữ liệu mark và coe của hàng, tạo đối tượng hàng điểm và tính tổng điểm hàng
+    cập nhật tổng điểm hàng trên giao diện
+    lấy tổng các hàng đang chọn, tính tổng chung và cập nhật giao diện */
     onMarkCoeChange(row) {
         const mark = row.fields.mark.value;
         const coe = row.fields.coe.value;

@@ -12,7 +12,9 @@
     <table id="markTable">
       <thead>
         <tr>
-          <th></th>
+          <th>
+            <input type="checkbox" id="selectAllCheckbox">
+          </th>
           <th>First Name <span class="required">*</span> </th>
           <th>Last Name <span class="required">*</span> </th>
           <th>Date of birth <span class="required">*</span> </th>
@@ -36,6 +38,7 @@
 
     <div class="save-container">
       <button type="button" id="saveButton">Save</button>
+      <button type="button" id="deleteCheckedRow">Delete All</button>
     </div>
 
     <div id="output"></div>
